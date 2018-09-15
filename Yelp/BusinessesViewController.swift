@@ -11,11 +11,11 @@ import UIKit
 class BusinessesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate {
     
     
-    @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var tableView: UITableView!
     
     var businesses: [Business]!
     var searchController: UISearchController!
+    let searchBar = UISearchBar()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,15 +25,7 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         tableView.rowHeight = UITableViewAutomaticDimension
         tableView.estimatedRowHeight = 120
         
-        searchController = UISearchController(searchResultsController: nil)
-        //searchController.searchResultsUpdater = self
-        searchController.dimsBackgroundDuringPresentation = false
-        searchController.searchBar.sizeToFit()
-        tableView.tableHeaderView = searchController.searchBar
-        
-        // Sets this view controller as presenting view controller for the search interface
-        definesPresentationContext = true
-        
+        setupSearchBar()
         
         Business.searchWithTerm(term: "Thai", completion: { (businesses: [Business]?, error: Error?) -> Void in
             
@@ -62,6 +54,14 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         
     }
     
+    func setupSearchBar() {
+        searchBar.showsCancelButton = false
+        searchBar.placeholder = "Restaurants"
+        searchBar.delegate = self
+        
+        navigationItem.titleView = searchBar
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -82,17 +82,14 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         return cell
     }
     
-    /*
-    func updateSearchResults(for searchController: UISearchController) {
-        if let searchText = searchController.searchBar.text {
-            businesses = searchText.isEmpty ? Business : Business.filter({(dataString: String) -> Bool in
-                return dataString.rangeOfString(searchText, options: .CaseInsensitiveSearch) != nil
-            })
-            
-            tableView.reloadData()
-        }
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        searchBar.endEditing(true)
     }
-    */
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.endEditing(true)
+    }
+    
     /*
      // MARK: - Navigation
      
